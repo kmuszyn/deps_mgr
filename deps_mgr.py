@@ -1,18 +1,63 @@
 #!/usr/bin/env python3
 
-def get_test_repo():
-	from git import Repo
-	Repo.clone_from("https://github.com/kmuszyn/deps_test.git", "deps_test")
+DEPS_DIR = "deps"
+DEPS_FILE = "deps.cfg"
 
-def load_config():
-	import json
-	with open("deps.cfg","r") as f:
-		deps_config = json.load(f)
-		for repo in deps_config["repos"]:
-			print("{}: {}".format(repo["name"], repo["url"]))
+# config keys TODO move them somewhere
+KEY_BRANCH = "branch"
+KEY_DEPS = "deps"
+KEY_NAME = "name"
+KEY_TYPE = "type"
+KEY_URL = "url"
+KEY_VERSION = "version"
+
+import logging
+import os
+import yaml
+
+from git import Repo
+
+
+log = logging.getLogger(__name__)
+
+
+def get_test_repo():
+    from git import Repo
+    Repo.clone_from("https://github.com/kmuszyn/deps_test.git", "deps_test")
+
+class GitRepoConfig():
+
+    def __init__(self, repo_config):
+        self.name = repo_config[KEY_NAME]
+        self.url = repo_config[KEY_URL]
+        self.branch = repo_config[KEY_BRANCH]
+        self.version = repo_config[KEY_VERSION]
+
+def handle_git_dep(repo_config):
+    log.debug("Getting git repository... name: %s", repo_config.name)
+    REPO_DEST_DIR = os.path.join(DEPS_DIR, repo_config.name)
+    Repo.clone_from(repo_config.url, REPO_DEST_DIR)
+
+def get_dep(dep_config):
+    log.debug("Getting dependency: %s type: %s", dep_config[KEY_NAME], dep_config[KEY_TYPE])
+
+    if dep_config[KEY_TYPE] == "git":
+        handle_git_dep(GitRepoConfig(dep_config))
+
+def read_config(dir):
+    full_file_path = os.path.join(dir, DEPS_FILE)
+
+    deps_config = {}
+    with open(full_file_path,"r") as f:
+        deps_config = yaml.safe_load(f)
+
+    log.debug("Got %s deps", len(deps_config[KEY_DEPS]))
+    for dep in deps_config[KEY_DEPS]:
+        get_dep(dep)
+
+def get_deps(dir):
+    deps_config = read_config(dir)
 
 if __name__ == "__main__":
-	print("main")
-
-	load_config()
-	# get_test_repo()
+    logging.basicConfig(level=logging.DEBUG)
+    get_deps(".")
