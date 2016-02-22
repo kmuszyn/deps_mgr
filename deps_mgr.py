@@ -17,9 +17,7 @@ import yaml
 
 from git import Repo
 
-
 log = logging.getLogger(__name__)
-
 
 def get_test_repo():
     from git import Repo
@@ -28,6 +26,7 @@ def get_test_repo():
 class GitRepoConfig():
 
     def __init__(self, repo_config):
+        # TODO add config validatin
         self.name = repo_config[KEY_NAME]
         self.url = repo_config[KEY_URL]
         self.branch = repo_config[KEY_BRANCH]
@@ -35,8 +34,22 @@ class GitRepoConfig():
 
 def handle_git_dep(repo_config):
     log.debug("Getting git repository... name: %s", repo_config.name)
-    REPO_DEST_DIR = os.path.join(DEPS_DIR, repo_config.name)
-    Repo.clone_from(repo_config.url, REPO_DEST_DIR)
+    REPO_DIR = os.path.join(DEPS_DIR, repo_config.name)
+
+    repo = None
+    if not os.path.exists(REPO_DIR):
+        log.debug("Dir %s not present, cloning repository", REPO_DIR)
+        repo = Repo.clone_from(repo_config.url, REPO_DIR)
+    else:
+        repo = Repo(REPO_DIR)
+        log.debug("Repo already exists, branch: %s, commit: %s", repo.active_branch, repo.head.commit)
+
+    if repo_config.branch:
+        repo.git.checkout(repo_config.branch)
+        repo.git.reset(repo_config.version)
+        #todo add checking if commit exists on a branch
+
+    # else: TODO add just checkout to commit (detached head)
 
 def get_dep(dep_config):
     log.debug("Getting dependency: %s type: %s", dep_config[KEY_NAME], dep_config[KEY_TYPE])
