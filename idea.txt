@@ -1,0 +1,43 @@
+---
+depends:
+  - core 
+      version: 1.3.2
+      action: unpack
+
+  - gui 
+      version: 3.2.2
+      action: plugins/convert_adk_zip.py
+
+  - flibs 
+      version: git@9aa39399fc4445454a432345754@develop
+
+
+# repos configuration
+
+repositories: 
+  - name: base_repo
+    location: base_repo.yaml
+
+
+# repository file
+
+core: 
+  - 1.3.2
+      url: http://...../core.1.3.2.zip
+      depends: 
+        - foundationlibs 1.2.3
+        - gui 2.3.4
+        - com 1.1.1
+
+  - 1.1.1
+      url: ....
+      sha: ...
+      depends:
+        - item1 22.33.21.1
+        - item2 22.2.1.3.4
+
+  - git
+      url: http://...../core.git
+
+
+deps_mgr depends.yaml --repositories repos.yaml
