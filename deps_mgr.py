@@ -71,6 +71,12 @@ def read_config(dir):
 def get_deps(dir):
     deps_config = read_config(dir)
 
+def parse_repository_data(repo_file):
+    repository_data = {}
+    with open(repo_file, "r") as f:
+        repository_data = yaml.safe_load(f)
+    return repository_data
+
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
     get_deps(".")
