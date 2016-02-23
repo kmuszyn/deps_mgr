@@ -66,10 +66,20 @@ class RepositoryDataLoaderTest(unittest.TestCase):
 
     def test_load_repository(self):
         repository_data = deps_mgr.parse_repository_data(self.TEST_FILE)
-        print("Repo data:",repository_data)
-        for app, value in repository_data.items():
-            for version in value:
-                print(app, next(iter(version)))
+
+        self.assertEqual(repository_data.get_url(component = "guilib", version = "1.0.0.0"), "http://url_to_1.0.0.0.zip")
+        self.assertEqual(repository_data.get_url(component = "guilib", version = "1.1.0.0"), "http://url_to_1.1.0.0.zip")
+        self.assertEqual(repository_data.get_url(component = "guilib", version = "git"), "http://git_repo_path.git")
+        self.assertEqual(repository_data.get_url(component = "my_app", version = "1.0.0.0"), "http://link_to_app_package_1.0.0.0.zip")
+        self.assertEqual(repository_data.get_url(component = "networklib", version = "1.0.0.0"), "http://networklib/1.0.0.0.zip")
+
+        self.assertEqual(repository_data.get_dependencies(component = "my_app", version = "1.0.0.0"), 
+            [{"component" : "guilib", "version" : "1.0.0.0"}])
+
+        self.assertEqual(repository_data.get_dependencies(component = "my_app", version = "1.2.0.0"), 
+            [{"component" : "guilib", "version" : "1.1.0.0"}, {"component" : "networklib", "version" : "1.0.0.0"}])
+
+        self.assertEqual(repository_data.get_dependencies(component = "networklib", version = "1.0.0.0"), [])
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
