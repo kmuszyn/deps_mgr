@@ -1,7 +1,7 @@
 ---
 # list of all components available for deps_mgr
 
-guilib: 
+libgui: 
 
   1.0.0.0:
     url: http://url_to_1.0.0.0.zip
@@ -17,15 +17,15 @@ my_app:
   1.0.0.0:
     url: http://link_to_app_package_1.0.0.0.zip
     depends: 
-      - guilib 1.0.0.0
+      - libgui 1.0.0.0
 
   1.2.0.0:
     url: http://link_to_app_package_1.2.0.0.zip
     depends: 
-      - guilib 1.1.0.0 
-      - networklib 1.0.0.0
+      - libgui 1.1.0.0 
+      - libnetwork 1.0.0.0
 
-networklib:
+libnetwork:
   
   1.0.0.0:
-    url: http://networklib/1.0.0.0.zip
+    url: http://libnetwork/1.0.0.0.zip

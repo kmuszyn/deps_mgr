@@ -1,0 +1,9 @@
+---
+depends:
+  libgui:
+    version: 1.0.0.0
+    #action: unpack
+
+  libnetwork:
+    version: 1.0.0.0
+    # action: plugins/convert_adk_zip.py
