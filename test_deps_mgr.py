@@ -99,6 +99,26 @@ class ConfigLoaderTest(unittest.TestCase):
         self.assertTrue("version" in dependencies["depends"]["libnetwork"])
         self.assertEqual(dependencies["depends"]["libnetwork"]["version"], "1.0.0.0")
 
+class GitDependencyDownloadTest(unittest.TestCase):
+
+    def test():
+
+        REPOSITORY_FILE = os.path.join(os.getcwd(),TEST_RESOURCES_DIR,"test_repository.yaml")
+        deps_repository = Repository()
+        deps_repository.add_repository_config_file(REPOSITORY_FILE)
+
+        DEPS_FILE = os.path.join(os.getcwd(),TEST_RESOURCES_DIR,"test_dependencies.yaml")
+
+
+        # classes:
+        # Repository - maintains information about where we can download a component
+        # Dependency - contains name, version + additional parameters (if git, then branch & commit)
+        # 
+        # Repository.get_dependency_info(dependency) -> should return information about the dependency
+        # with a location and additional dependencies (?)
+        # actually a dependecy info implies what component list is required
+        # so repository should return a full list I think
+        # but: dependencies may have a longer list of components...
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
