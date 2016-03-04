@@ -1,0 +1,31 @@
+---
+# list of all components available for deps_mgr
+
+libgui: 
+
+  1.0.0.0:
+    url: http://url_to_1.0.0.0.zip
+
+  1.1.0.0:
+    url: http://url_to_1.1.0.0.zip
+
+  git:
+    url: http://git_repo_path.git
+
+my_app:
+
+  1.0.0.0:
+    url: http://link_to_app_package_1.0.0.0.zip
+    depends: 
+      - libgui 1.0.0.0
+
+  1.2.0.0:
+    url: http://link_to_app_package_1.2.0.0.zip
+    depends: 
+      - libgui 1.1.0.0 
+      - libnetwork 1.0.0.0
+
+libnetwork:
+  
+  1.0.0.0:
+    url: http://libnetwork/1.0.0.0.zip

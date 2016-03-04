@@ -71,6 +71,45 @@ def read_config(dir):
 def get_deps(dir):
     deps_config = read_config(dir)
 
+def parse_yaml(file_name):
+    data = []
+    with open(file_name, "r") as f:
+        data = yaml.safe_load(f)
+    return data
+
+def parse_dependencies(file_name):
+    return parse_yaml(file_name)
+
+def parse_repositories_list(file_name):
+    return parse_yaml(file_name)
+
+class RepositoryData:
+    repository_data = dict()
+    
+    def __init__(self, repository_file):
+        with open(repository_file, "r") as f:
+            self.repository_data = yaml.safe_load(f)
+
+    def get_url(self, component, version):
+        return self.repository_data[component][version]["url"]
+
+    def get_dependencies(self, component, version):
+        component_details = self.repository_data[component][version]
+        
+        if "depends" not in component_details:
+            return []
+
+        deps = self.repository_data[component][version]["depends"]
+        result = []
+        for d in deps:
+            result.append(dict(zip(["component","version"],  d.split(" "))))
+
+        return result
+
+def parse_repository_data(file_name):
+    repository_data = RepositoryData(file_name)
+    return repository_data
+
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
     get_deps(".")

@@ -1,0 +1,4 @@
+---
+repositories: 
+  - name: test_repository
+    location: test_repository.yaml
