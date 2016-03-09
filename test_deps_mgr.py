@@ -65,8 +65,8 @@ class ConfigLoaderTest(unittest.TestCase):
     def test_load_repository_list(self):
         TEST_FILE = os.path.join(os.getcwd(),TEST_RESOURCES_DIR,"test_repository_list.yaml")
         repositories = deps_mgr.parse_repositories_list(TEST_FILE)
-        self.assertEqual(repositories["repositories"][0]["name"], "test_repository")
-        self.assertEqual(repositories["repositories"][0]["location"], "test_repository.yaml")
+        self.assertEqual(repositories[0].name, "test_repository")
+        self.assertEqual(repositories[0].location, "test_repository.yaml")
 
     def test_load_repository(self):
         TEST_FILE = os.path.join(os.getcwd(),TEST_RESOURCES_DIR,"test_repository.yaml")
@@ -101,7 +101,7 @@ class ConfigLoaderTest(unittest.TestCase):
 
 class GitDependencyDownloadTest(unittest.TestCase):
 
-    def test():
+    def do_not_run_yet():
 
         REPOSITORY_FILE = os.path.join(os.getcwd(),TEST_RESOURCES_DIR,"test_repository.yaml")
         deps_repository = Repository()
@@ -109,6 +109,13 @@ class GitDependencyDownloadTest(unittest.TestCase):
 
         DEPS_FILE = os.path.join(os.getcwd(),TEST_RESOURCES_DIR,"test_dependencies.yaml")
 
+
+        deps_mgr = DepsMgr()
+        deps_mgr.set_repository_list(REPOSITORY_LIST_FILE)
+        deps_mgr.load_repositories()
+        deps_mgr.get_dependencies(DEPS_FILE)
+
+        # md5 of output with git repo
 
         # classes:
         # Repository - maintains information about where we can download a component
@@ -119,6 +126,14 @@ class GitDependencyDownloadTest(unittest.TestCase):
         # actually a dependecy info implies what component list is required
         # so repository should return a full list I think
         # but: dependencies may have a longer list of components...
+
+'''
+test ideas:
+adding multiple repositories
+    with conflicting items
+
+dependency not present in any repository
+'''
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)

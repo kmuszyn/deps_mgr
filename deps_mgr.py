@@ -80,8 +80,22 @@ def parse_yaml(file_name):
 def parse_dependencies(file_name):
     return parse_yaml(file_name)
 
+class Repository:
+    name = ""
+    location = ""
+
+    def __init__(self, name, location):
+        self.name = name
+        self.location = location
+
+
 def parse_repositories_list(file_name):
-    return parse_yaml(file_name)
+    result = []
+    repositories_configuration = parse_yaml(file_name)
+    for repository_dictionary in repositories_configuration["repositories"]:
+        r = Repository(repository_dictionary["name"], repository_dictionary["location"])
+        result.append(r)
+    return result
 
 class RepositoryData:
     repository_data = dict()
@@ -109,6 +123,11 @@ class RepositoryData:
 def parse_repository_data(file_name):
     repository_data = RepositoryData(file_name)
     return repository_data
+
+class DepsMgr:
+    repositories = []
+    def set_repository_list(repository_list_file):
+        repositories = parse_repositories_list(repository_list_file)
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
