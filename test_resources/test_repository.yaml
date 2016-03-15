@@ -26,6 +26,11 @@ my_app:
       - libnetwork 1.0.0.0
 
 libnetwork:
-  
   1.0.0.0:
     url: http://libnetwork/1.0.0.0.zip
+    depends: 
+      - libcore 0.0.0.1
+
+libcore:
+  0.0.0.1:
+    url: http://libcore/0.0.0.1.zip

@@ -1,4 +1,4 @@
 ---
 repositories: 
   - name: test_repository
-    location: test_repository.yaml
+    location: test_resources/test_repository.yaml

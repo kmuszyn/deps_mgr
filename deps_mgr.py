@@ -89,12 +89,15 @@ class Repository:
         self.location = location
 
 
-def parse_repositories_list(file_name):
+def parse_repo_description(file_name):
     result = []
     repositories_configuration = parse_yaml(file_name)
     for repository_dictionary in repositories_configuration["repositories"]:
-        r = Repository(repository_dictionary["name"], repository_dictionary["location"])
-        result.append(r)
+        single_repo = Repository(
+                repository_dictionary["name"], 
+                repository_dictionary["location"]
+            )
+        result.append(single_repo)
     return result
 
 class RepositoryData:
@@ -124,11 +127,44 @@ def parse_repository_data(file_name):
     repository_data = RepositoryData(file_name)
     return repository_data
 
-class DepsMgr:
-    repositories = []
-    def set_repository_list(repository_list_file):
-        repositories = parse_repositories_list(repository_list_file)
+class PackageInfo:
+
+    repositories = [] # this will be a list of Repository objects
+    packages = dict()
+
+    def set_repo_description_file(self, repository_list_file):
+        self.repositories = parse_repo_description(repository_list_file)
+
+    def update_repositories(self):
+        # browsing all registered repositories
+        for single_repo in self.repositories:
+            # for a repository, getting latest data from repository location
+            # right now file repo is supported only
+            with open(single_repo.location, "r") as f:
+                repo_packages = yaml.safe_load(f)
+                # todo check for overwrites here!
+                self.packages.update(repo_packages)
+
+    def get_dependencies(self, package_name, package_version):
+        print("\nchecking:", package_name, package_version)
+        if not package_name in self.packages:
+            return []
+
+        version_related_info = self.packages[package_name][package_version]
+        if 'depends' not in version_related_info:
+            return []
+        return version_related_info['depends']
+
+class DependencyParser:
+    '''
+    Responsible for parsing denepdencies file.
+    Stores dependency list, in future this may also store additional dependency configuration
+    '''
+    dependencies = dict()
+
+    def parse(self, dependency_file):
+        data = parse_yaml(dependency_file)
+        self.dependencies = data['depends']
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
-    get_deps(".")

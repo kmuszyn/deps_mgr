@@ -64,9 +64,9 @@ class ConfigLoaderTest(unittest.TestCase):
 
     def test_load_repository_list(self):
         TEST_FILE = os.path.join(os.getcwd(),TEST_RESOURCES_DIR,"test_repository_list.yaml")
-        repositories = deps_mgr.parse_repositories_list(TEST_FILE)
+        repositories = deps_mgr.parse_repo_description(TEST_FILE)
         self.assertEqual(repositories[0].name, "test_repository")
-        self.assertEqual(repositories[0].location, "test_repository.yaml")
+        self.assertEqual(repositories[0].location, "test_resources/test_repository.yaml")
 
     def test_load_repository(self):
         TEST_FILE = os.path.join(os.getcwd(),TEST_RESOURCES_DIR,"test_repository.yaml")
@@ -84,7 +84,7 @@ class ConfigLoaderTest(unittest.TestCase):
         self.assertEqual(repository_data.get_dependencies(component = "my_app", version = "1.2.0.0"), 
             [{"component" : "libgui", "version" : "1.1.0.0"}, {"component" : "libnetwork", "version" : "1.0.0.0"}])
 
-        self.assertEqual(repository_data.get_dependencies(component = "libnetwork", version = "1.0.0.0"), [])
+        self.assertEqual(repository_data.get_dependencies(component = "libgui", version = "1.0.0.0"), [])
 
     def test_load_dependencies(self):
         TEST_FILE = os.path.join(os.getcwd(),TEST_RESOURCES_DIR,"test_dependencies.yaml")
@@ -101,19 +101,31 @@ class ConfigLoaderTest(unittest.TestCase):
 
 class GitDependencyDownloadTest(unittest.TestCase):
 
-    def do_not_run_yet():
+    def test_basic(self):
 
-        REPOSITORY_FILE = os.path.join(os.getcwd(),TEST_RESOURCES_DIR,"test_repository.yaml")
-        deps_repository = Repository()
-        deps_repository.add_repository_config_file(REPOSITORY_FILE)
+        # basic loading of simple repository description file
+        # it has only one repository named "test_repository"
+        REPOSITORY_LIST_FILE = os.path.join(os.getcwd(),TEST_RESOURCES_DIR,"test_repository_list.yaml")
+        pkg_info = deps_mgr.PackageInfo()
+        pkg_info.set_repo_description_file(REPOSITORY_LIST_FILE)
+        self.assertEqual(1, len(pkg_info.repositories))
+        self.assertEqual("test_repository", pkg_info.repositories[0].name)
+
+        # repo is loaded, we can update repositories to get list of 
+        # available packages
+        pkg_info.update_repositories()
+        self.assertTrue("libnetwork" in pkg_info.packages)
+        self.assertTrue("my_app" in pkg_info.packages)
+        self.assertTrue("libgui" in pkg_info.packages)
 
         DEPS_FILE = os.path.join(os.getcwd(),TEST_RESOURCES_DIR,"test_dependencies.yaml")
+        parser = deps_mgr.DependencyParser()
+        parser.parse(DEPS_FILE)
+        for dependency_name, dependency_info in parser.dependencies.items():
+            print(pkg_info.get_dependencies(dependency_name, dependency_info['version']))
 
 
-        deps_mgr = DepsMgr()
-        deps_mgr.set_repository_list(REPOSITORY_LIST_FILE)
-        deps_mgr.load_repositories()
-        deps_mgr.get_dependencies(DEPS_FILE)
+        # deps_mgr.get_dependencies(DEPS_FILE)
 
         # md5 of output with git repo
 
