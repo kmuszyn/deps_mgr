@@ -57,28 +57,13 @@ def get_dep(dep_config):
     if dep_config[KEY_TYPE] == "git":
         handle_git_dep(GitRepoConfig(dep_config))
 
-def read_config(dir):
-    full_file_path = os.path.join(dir, DEPS_FILE)
-
-    deps_config = {}
-    with open(full_file_path,"r") as f:
-        deps_config = yaml.safe_load(f)
-
-    log.debug("Got %s deps", len(deps_config[KEY_DEPS]))
-    for dep in deps_config[KEY_DEPS]:
-        get_dep(dep)
-
-def get_deps(dir):
-    deps_config = read_config(dir)
+###############################################################################################################
 
 def parse_yaml(file_name):
     data = []
     with open(file_name, "r") as f:
         data = yaml.safe_load(f)
     return data
-
-def parse_dependencies(file_name):
-    return parse_yaml(file_name)
 
 class Repository:
     name = ""
@@ -100,34 +85,7 @@ def parse_repo_description(file_name):
         result.append(single_repo)
     return result
 
-class RepositoryData:
-    repository_data = dict()
-    
-    def __init__(self, repository_file):
-        with open(repository_file, "r") as f:
-            self.repository_data = yaml.safe_load(f)
-
-    def get_url(self, component, version):
-        return self.repository_data[component][version]["url"]
-
-    def get_dependencies(self, component, version):
-        component_details = self.repository_data[component][version]
-        
-        if "depends" not in component_details:
-            return []
-
-        deps = self.repository_data[component][version]["depends"]
-        result = []
-        for d in deps:
-            result.append(dict(zip(["component","version"],  d.split(" "))))
-
-        return result
-
-def parse_repository_data(file_name):
-    repository_data = RepositoryData(file_name)
-    return repository_data
-
-class PackageInfo:
+class PackageRepository:
 
     repositories = [] # this will be a list of Repository objects
     packages = dict()
@@ -140,10 +98,10 @@ class PackageInfo:
         for single_repo in self.repositories:
             # for a repository, getting latest data from repository location
             # right now file repo is supported only
-            with open(single_repo.location, "r") as f:
-                repo_packages = yaml.safe_load(f)
-                # todo check for overwrites here!
-                self.packages.update(repo_packages)
+            repo_packages = parse_yaml(single_repo.location)
+            # todo check for overwrites here!
+            self.packages.update(repo_packages)
+                
 
     def prepare_download_list(self, input_packages):
         result = dict()
