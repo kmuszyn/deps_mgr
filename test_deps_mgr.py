@@ -121,9 +121,13 @@ class GitDependencyDownloadTest(unittest.TestCase):
         DEPS_FILE = os.path.join(os.getcwd(),TEST_RESOURCES_DIR,"test_dependencies.yaml")
         parser = deps_mgr.DependencyParser()
         parser.parse(DEPS_FILE)
-        for dependency_name, dependency_info in parser.dependencies.items():
-            print(pkg_info.get_dependencies(dependency_name, dependency_info['version']))
-
+        # for dependency_name, dependency_info in parser.dependencies.items():
+            # print(pkg_info.get_dependencies(dependency_name, dependency_info['version']))
+        all_required_packages = pkg_info.prepare_download_list(parser.dependencies)
+        
+        for package, version in all_required_packages.items():
+            url = pkg_info.get_url(package,version)
+            print("Downloading {}-{} from {}".format(package, version,url))
 
         # deps_mgr.get_dependencies(DEPS_FILE)
 

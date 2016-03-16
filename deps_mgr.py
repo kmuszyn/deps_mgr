@@ -145,15 +145,38 @@ class PackageInfo:
                 # todo check for overwrites here!
                 self.packages.update(repo_packages)
 
-    def get_dependencies(self, package_name, package_version):
-        print("\nchecking:", package_name, package_version)
-        if not package_name in self.packages:
-            return []
+    def prepare_download_list(self, input_packages):
+        result = dict()
+        for package, package_info in input_packages.items():
+            package_version = package_info['version']
+            # TODO duplicate checks!
+            result[package] = package_version
+            dependencies = self.get_dependencies(package, package_version)
+            result.update(dependencies)
+        return result
 
+    def get_dependencies(self, package_name, package_version):
+        if not package_name in self.packages:
+            return dict()
+
+        # packages is a map of
+        # name -> version -> depends (list)
         version_related_info = self.packages[package_name][package_version]
         if 'depends' not in version_related_info:
-            return []
-        return version_related_info['depends']
+            return dict()
+
+        result = dict()
+        package_dependencies = version_related_info['depends']
+        for d in package_dependencies:
+            name = d.split(" ")[0]
+            version = d.split(" ")[1]
+            result[name] = version
+        return result
+
+
+    def get_url(self, package, version):
+        return self.packages[package][version]['url']
+
 
 class DependencyParser:
     '''
